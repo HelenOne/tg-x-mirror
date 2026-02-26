@@ -1,0 +1,23 @@
+name: Init 20 Tweets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+
+    - run: pip install -r requirements.txt
+
+    - name: Run Init Script
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+        RSS_URL: ${{ secrets.RSS_URL }}
+      run: python3 init_posts.py
