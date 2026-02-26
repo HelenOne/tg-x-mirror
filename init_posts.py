@@ -1,8 +1,9 @@
 import os
+import time
+import re
 import feedparser
 from telegram import Bot
 from telegram import InputMediaPhoto
-import time
 
 TOKEN = os.environ["BOT_TOKEN"]
 CHANNEL_ID = os.environ["CHANNEL_ID"]
@@ -11,25 +12,28 @@ RSS_URL = os.environ["RSS_URL"]
 bot = Bot(token=TOKEN, request_kwargs={"read_timeout": 20, "connect_timeout": 20})
 
 feed = feedparser.parse(RSS_URL)
-
 entries = feed.entries[:20]
+
+def extract_images(description):
+    return re.findall(r'<img src="([^"]+)"', description)
 
 for entry in reversed(entries):
     text = entry.title
-    media = entry.get("media_content", [])
+    description = entry.description
+    images = extract_images(description)
 
-    if len(media) > 1:
+    if len(images) > 1:
         media_group = []
-        for i, item in enumerate(media):
+        for i, img in enumerate(images):
             if i == 0:
-                media_group.append(InputMediaPhoto(item["url"], caption=text))
+                media_group.append(InputMediaPhoto(img, caption=text))
             else:
-                media_group.append(InputMediaPhoto(item["url"]))
+                media_group.append(InputMediaPhoto(img))
         bot.send_media_group(chat_id=CHANNEL_ID, media=media_group)
         time.sleep(1)
 
-    elif len(media) == 1:
-        bot.send_photo(chat_id=CHANNEL_ID, photo=media[0]["url"], caption=text)
+    elif len(images) == 1:
+        bot.send_photo(chat_id=CHANNEL_ID, photo=images[0], caption=text)
         time.sleep(1)
 
     else:
