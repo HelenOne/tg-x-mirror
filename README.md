@@ -1,0 +1,1 @@
+A simple Telegram bot that mirrors my tweets from X (Twitter) RSS feed to my Telegram channel using GitHub Actions
