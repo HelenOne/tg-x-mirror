@@ -9,7 +9,7 @@ TOKEN = os.environ["BOT_TOKEN"]
 CHANNEL_ID = os.environ["CHANNEL_ID"]
 RSS_URL = os.environ["RSS_URL"]
 
-bot = Bot(token=TOKEN, request_kwargs={"read_timeout": 20, "connect_timeout": 20})
+bot = Bot(token=TOKEN)
 
 feed = feedparser.parse(RSS_URL)
 entries = feed.entries[:20]
