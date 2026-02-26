@@ -1,0 +1,34 @@
+name: Telegram RSS Bot
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run Bot
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+        RSS_URL: ${{ secrets.RSS_URL }}
+      run: python3 post_new.py
+
+    - name: Commit updated posted.json
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+        git add posted.json
+        git commit -m "Update posted tweets" || echo "No changes"
+        git push
